@@ -7,6 +7,7 @@ import createMapLayoutScreen from "./game/mapLayoutScreen.mjs";
 import createInnBetweenScreen from "./game/innbetweenScreen.mjs";
 import createBattleshipScreen from "./game/battleshipsScreen.mjs";
 import { meetsMinimumRequirements, showResolutionPrompt } from "./utils/resolution.mjs";
+import { getText, getAvailableLanguages, setLanguage } from "./utils/language.mjs";
 
 const MAIN_MENU_ITEMS = buildMenu();
 
@@ -67,17 +68,16 @@ function buildMenu() {
     let menuItemCount = 0;
     return [
         {
-            text: "Start Game", id: menuItemCount++, action: function () {
+            text: getText('MENU_START_GAME'), 
+            id: menuItemCount++, 
+            action: function () {
                 clearScreen();
                 let innbetween = createInnBetweenScreen();
-                innbetween.init(`SHIP PLACMENT\nFirst player get ready.\nPlayer two look away`, () => {
-
+                innbetween.init(getText('SHIP_PLACEMENT_PLAYER1'), () => {
                     let p1map = createMapLayoutScreen();
                     p1map.init(FIRST_PLAYER, (player1ShipMap) => {
-
-
                         let innbetween = createInnBetweenScreen();
-                        innbetween.init(`SHIP PLACMENT\nSecond player get ready.\nPlayer one look away`, () => {
+                        innbetween.init(getText('SHIP_PLACEMENT_PLAYER2'), () => {
                             let p2map = createMapLayoutScreen();
                             p2map.init(SECOND_PLAYER, (player2ShipMap) => {
                                 return createBattleshipScreen(player1ShipMap, player2ShipMap);
@@ -86,15 +86,41 @@ function buildMenu() {
                         });
                         return innbetween;
                     });
-
                     return p1map;
-
                 }, 3);
                 currentState.next = innbetween;
                 currentState.transitionTo = "Map layout";
             }
         },
-        { text: "Exit Game", id: menuItemCount++, action: function () { print(ANSI.SHOW_CURSOR); clearScreen(); process.exit(); } },
+        {
+            text: getText('MENU_LANGUAGE'),
+            id: menuItemCount++,
+            action: function() {
+                const languageMenu = createMenu(
+                    getAvailableLanguages().map((lang, index) => ({
+                        text: lang.name,
+                        id: index,
+                        action: function() {
+                            setLanguage(lang.code);
+                            mainMenuScene = createMenu(buildMenu());
+                            currentState.next = mainMenuScene;
+                            currentState.transitionTo = "Main Menu";
+                        }
+                    }))
+                );
+                currentState.next = languageMenu;
+                currentState.transitionTo = "Language Menu";
+            }
+        },
+        { 
+            text: getText('MENU_EXIT'), 
+            id: menuItemCount++, 
+            action: function () { 
+                print(ANSI.SHOW_CURSOR); 
+                clearScreen(); 
+                process.exit(); 
+            } 
+        },
     ];
 }
 
