@@ -40,7 +40,7 @@ function createMapLayoutScreen() {
                     return false;
                 }
             } else {
-                if (this.cursorRow + size > this.height) {
+                if (this.cursorRow + size > GAME_BOARD_DIM) {
                     return false;
                 }
             }
