@@ -33,11 +33,15 @@ const translations = {
         RESOLUTION_HEIGHT: "Height",
         RESOLUTION_MINIMUM: "minimum",
         RESOLUTION_WAITING: "Please resize your terminal window to continue...",
+        RESOLUTION_LIVE_UPDATE: "Size will update automatically",
+        RESOLUTION_COLUMNS: "columns",
+        RESOLUTION_ROWS: "rows",
         
         BATTLE_YOUR_BOARD: "Your Board",
         BATTLE_ENEMY_BOARD: "Enemy Board",
         BATTLE_HIT: "Hit!",
         BATTLE_MISS: "Miss!"
+        
     },
     [LANGUAGES.NORWEGIAN]: {
         MENU_START_GAME: "Start Spill",
@@ -68,6 +72,9 @@ const translations = {
         RESOLUTION_HEIGHT: "Høyde",
         RESOLUTION_MINIMUM: "minimum",
         RESOLUTION_WAITING: "Vennligst endre størrelse på terminalvinduet for å fortsette...",
+        RESOLUTION_LIVE_UPDATE: "Størrelsen oppdateres automatisk",
+        RESOLUTION_COLUMNS: "kolonner",
+        RESOLUTION_ROWS: "rader",
         
         BATTLE_YOUR_BOARD: "Ditt Brett",
         BATTLE_ENEMY_BOARD: "Fiendens Brett",

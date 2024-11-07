@@ -1,5 +1,7 @@
-const MIN_TERMINAL_WIDTH = 80;  
-const MIN_TERMINAL_HEIGHT = 24; 
+import { getText } from "./language.mjs";
+
+const MIN_TERMINAL_WIDTH = 80;
+const MIN_TERMINAL_HEIGHT = 24;
 
 function getTerminalSize() {
     return {
@@ -16,23 +18,24 @@ function meetsMinimumRequirements() {
 function showResolutionPrompt() {
     const { width, height } = getTerminalSize();
     const output = [
-        "\x1b[31m\x1b[1m⚠ Terminal Size Warning ⚠\x1b[0m",
+        `\x1b[31m\x1b[1m⚠ ${getText('RESOLUTION_WARNING')} ⚠\x1b[0m`,
         "",
-        "Your terminal window is too small to display the game properly.",
+        getText('RESOLUTION_TOO_SMALL'),
         "",
-        "Current size:",
-        `Width: ${width} columns (minimum: ${MIN_TERMINAL_WIDTH})`,
-        `Height: ${height} rows (minimum: ${MIN_TERMINAL_HEIGHT})`,
+        getText('RESOLUTION_CURRENT_SIZE'),
+        `${getText('RESOLUTION_WIDTH')}: ${width} ${getText('RESOLUTION_COLUMNS')} (${getText('RESOLUTION_MINIMUM')}: ${MIN_TERMINAL_WIDTH})`,
+        `${getText('RESOLUTION_HEIGHT')}: ${height} ${getText('RESOLUTION_ROWS')} (${getText('RESOLUTION_MINIMUM')}: ${MIN_TERMINAL_HEIGHT})`,
         "",
-        "Please resize your terminal window to continue...",
+        getText('RESOLUTION_WAITING'),
         "",
-        "\x1b[33mWaiting for correct size...\x1b[0m"
+        getText('RESOLUTION_LIVE_UPDATE')
     ].join("\n");
 
     console.clear();
-    const startRow = Math.floor((height - 11) / 2); 
+    const startRow = Math.floor((height - 11) / 2);
     const startCol = Math.floor((width - 60) / 2); 
-    
+
+
     process.stdout.write(`\x1b[${startRow};${startCol}H${output}`);
 
     return new Promise((resolve) => {
@@ -40,10 +43,10 @@ function showResolutionPrompt() {
             if (meetsMinimumRequirements()) {
                 resolve();
             } else {
-                
                 const { width, height } = getTerminalSize();
-                process.stdout.write(`\x1b[${startRow + 5};${startCol}HWidth: ${width} columns (minimum: ${MIN_TERMINAL_WIDTH})`);
-                process.stdout.write(`\x1b[${startRow + 6};${startCol}HHeight: ${height} rows (minimum: ${MIN_TERMINAL_HEIGHT})`);
+                const sizeRow = startRow + 5;
+                process.stdout.write(`\x1b[${sizeRow};${startCol}H${getText('RESOLUTION_WIDTH')}: ${width} ${getText('RESOLUTION_COLUMNS')} (${getText('RESOLUTION_MINIMUM')}: ${MIN_TERMINAL_WIDTH})     `);
+                process.stdout.write(`\x1b[${sizeRow + 1};${startCol}H${getText('RESOLUTION_HEIGHT')}: ${height} ${getText('RESOLUTION_ROWS')} (${getText('RESOLUTION_MINIMUM')}: ${MIN_TERMINAL_HEIGHT})     `);
                 setTimeout(checkSize, 100);
             }
         }
