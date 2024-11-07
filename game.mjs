@@ -6,6 +6,7 @@ import createMenu from "./utils/menu.mjs";
 import createMapLayoutScreen from "./game/mapLayoutScreen.mjs";
 import createInnBetweenScreen from "./game/innbetweenScreen.mjs";
 import createBattleshipScreen from "./game/battleshipsScreen.mjs";
+import { meetsMinimumRequirements, showResolutionPrompt } from "./utils/resolution.mjs";
 
 const MAIN_MENU_ITEMS = buildMenu();
 
@@ -14,24 +15,51 @@ let currentState = null;    // The current active state in our finite-state mach
 let gameLoop = null;        // Variable that keeps a refrence to the interval id assigned to our game loop 
 
 let mainMenuScene = null;
+let isResolutionPromptActive = false;
 
-(function initialize() {
+async function initialize() {
+    if (!meetsMinimumRequirements()) {
+        isResolutionPromptActive = true;
+        await showResolutionPrompt();
+        isResolutionPromptActive = false;
+    }
+
     print(ANSI.HIDE_CURSOR);
     clearScreen();
     mainMenuScene = createMenu(MAIN_MENU_ITEMS);
     SplashScreen.next = mainMenuScene;
-    currentState = SplashScreen  // This is where we decide what state our finite-state machine will start in. 
-    gameLoop = setInterval(update, GAME_FPS); // The game is started.
-})();
+    currentState = SplashScreen;
+    gameLoop = setInterval(update, GAME_FPS);
+
+    process.stdout.on('resize', async () => {
+        if (!meetsMinimumRequirements() && !isResolutionPromptActive) {
+            clearInterval(gameLoop);
+            isResolutionPromptActive = true;
+            
+            await showResolutionPrompt();
+            isResolutionPromptActive = false;
+            
+            clearScreen();
+            currentState.isDrawn = false;  // Force redraw
+            gameLoop = setInterval(update, GAME_FPS);
+        } else if (meetsMinimumRequirements()) {
+            currentState.isDrawn = false;
+        }
+    });
+}
 
 function update() {
-    currentState.update(GAME_FPS);
-    currentState.draw(GAME_FPS);
-    if (currentState.transitionTo != null) {
-        currentState = currentState.next;
-        print(ANSI.CLEAR_SCREEN, ANSI.CURSOR_HOME);
+    if (!isResolutionPromptActive) {
+        currentState.update(GAME_FPS);
+        currentState.draw(GAME_FPS);
+        if (currentState.transitionTo != null) {
+            currentState = currentState.next;
+            print(ANSI.CLEAR_SCREEN, ANSI.CURSOR_HOME);
+        }
     }
 }
+
+initialize().catch(console.error);
 
 // Suport / Utility functions ---------------------------------------------------------------
 
