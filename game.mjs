@@ -11,9 +11,9 @@ import { getText, getAvailableLanguages, setLanguage } from "./utils/language.mj
 
 const MAIN_MENU_ITEMS = buildMenu();
 
-const GAME_FPS = 1000 / 60; // The theoretical refresh rate of our game engine
-let currentState = null;    // The current active state in our finite-state machine.
-let gameLoop = null;        // Variable that keeps a refrence to the interval id assigned to our game loop 
+const GAME_FPS = 1000 / 60;
+let currentState = null;
+let gameLoop = null;
 
 let mainMenuScene = null;
 let isResolutionPromptActive = false;
@@ -41,7 +41,7 @@ async function initialize() {
             isResolutionPromptActive = false;
             
             clearScreen();
-            currentState.isDrawn = false;  // Force redraw
+            currentState.isDrawn = false;
             gameLoop = setInterval(update, GAME_FPS);
         } else if (meetsMinimumRequirements()) {
             currentState.isDrawn = false;
@@ -54,15 +54,14 @@ function update() {
         currentState.update(GAME_FPS);
         currentState.draw(GAME_FPS);
         if (currentState.transitionTo != null) {
+            clearScreen();
             currentState = currentState.next;
-            print(ANSI.CLEAR_SCREEN, ANSI.CURSOR_HOME);
+            currentState.isDrawn = false;
         }
     }
 }
 
 initialize().catch(console.error);
-
-// Suport / Utility functions ---------------------------------------------------------------
 
 function buildMenu() {
     let menuItemCount = 0;
@@ -75,13 +74,20 @@ function buildMenu() {
                 let innbetween = createInnBetweenScreen();
                 innbetween.init(getText('SHIP_PLACEMENT_PLAYER1'), () => {
                     let p1map = createMapLayoutScreen();
-                    p1map.init(FIRST_PLAYER, (player1ShipMap) => {
+                    p1map.init(FIRST_PLAYER, (player1Board) => {
                         let innbetween = createInnBetweenScreen();
                         innbetween.init(getText('SHIP_PLACEMENT_PLAYER2'), () => {
                             let p2map = createMapLayoutScreen();
-                            p2map.init(SECOND_PLAYER, (player2ShipMap) => {
-                                return createBattleshipScreen(player1ShipMap, player2ShipMap);
-                            })
+                            p2map.init(SECOND_PLAYER, (player2Board) => {
+                                let battleScreen = createBattleshipScreen();
+                                battleScreen.init(player1Board, player2Board);
+                                let innbetween = createInnBetweenScreen();
+                                innbetween.init("Player 1's turn begins!", () => {
+                                    return battleScreen;
+                                }, 3);
+                                
+                                return innbetween;
+                            });
                             return p2map;
                         });
                         return innbetween;
