@@ -114,8 +114,20 @@ function createMapLayoutScreen() {
             }
 
             if (KeyBoardManager.isRotatePressed()) {
-                this.isHorizontal = !this.isHorizontal;
-                this.isDrawn = false;
+                const currentShip = this.ships[this.currentShipIndex];
+                if (currentShip) {
+                    if (this.isHorizontal) {
+                        if (this.cursorRow + currentShip.size <= GAME_BOARD_DIM) {
+                            this.isHorizontal = false;
+                            this.isDrawn = false;
+                        }
+                    } else {
+                        if (this.cursorColumn + currentShip.size <= GAME_BOARD_DIM) {
+                            this.isHorizontal = true;
+                            this.isDrawn = false;
+                        }
+                    }
+                }
             }
 
             if (KeyBoardManager.isEnterPressed() && this.currentShipIndex < this.ships.length) {
