@@ -95,7 +95,10 @@ function createMapLayoutScreen() {
                 this.isDrawn = false;
             }
             if (KeyBoardManager.isDownPressed()) {
-                this.cursorRow = Math.min(GAME_BOARD_DIM - 1, this.cursorRow + 1);
+                const maxRow = this.isHorizontal ?
+                    GAME_BOARD_DIM - 1 :
+                    GAME_BOARD_DIM - (this.ships[this.currentShipIndex]?.size || 1);
+                this.cursorRow = Math.min(maxRow, this.cursorRow + 1);
                 this.isDrawn = false;
             }
             if (KeyBoardManager.isLeftPressed()) {
@@ -103,7 +106,10 @@ function createMapLayoutScreen() {
                 this.isDrawn = false;
             }
             if (KeyBoardManager.isRightPressed()) {
-                this.cursorColumn = Math.min(GAME_BOARD_DIM - 1, this.cursorColumn + 1);
+                const maxCol = this.isHorizontal ?
+                    GAME_BOARD_DIM - (this.ships[this.currentShipIndex]?.size || 1) :
+                    GAME_BOARD_DIM - 1;
+                this.cursorColumn = Math.min(maxCol, this.cursorColumn + 1);
                 this.isDrawn = false;
             }
 
